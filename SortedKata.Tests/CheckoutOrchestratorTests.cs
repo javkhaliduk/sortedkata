@@ -10,10 +10,14 @@ using System.Linq;
 
 namespace SortedKata.Tests
 {
+    
     [TestClass]
     public class CheckoutOrchestratorTests
     {
+        Checkout checkoutItems;
+        Guid checkoutId;
         [TestMethod]
+        [TestCategory("Checkout > ScanItem")]
         public void AddItemsToCheckout_IfSkuNullOrEmpty_ShouldThrowArgumentNullException()
         {
             // arrange
@@ -24,6 +28,7 @@ namespace SortedKata.Tests
             action.Should().Throw<ArgumentNullException>();
         }
         [TestMethod]
+        [TestCategory("Checkout > ScanItem")]
         public void AddItemsToCheckout_AddItem_ShouldReturnTrue()
         {
             // arrange
@@ -49,6 +54,7 @@ namespace SortedKata.Tests
             action.Should().Throw<ArgumentNullException>();
         }
         [TestMethod]
+        [TestCategory("Checkout > CalculateDiscount")]
         public void CalculateDiscount_IfNoOfferFound_ShouldReturnDiscountValueZero()
         {
             // arrange
@@ -62,10 +68,10 @@ namespace SortedKata.Tests
         }
 
         [TestMethod]
+        [TestCategory("Checkout > GetTotalPrice")]
         public void GetTotalPrice_ByCheckoutId_ShouldMatchExpectedValue()
         {
             // arrange
-            var id = Guid.NewGuid();
             var offerMock = new Mock<IOfferOrchestrator>();
             offerMock.Setup(mock => mock.GetOffer("B15"))
                 .Returns(new ItemOffer { OfferPrice = 0.45m, Quantity = 2, SKU = "B15" });
@@ -73,18 +79,29 @@ namespace SortedKata.Tests
                .Returns(new ItemOffer { OfferPrice = 1.30m, Quantity = 3, SKU = "A99" });
             var orchestrator = new CheckoutOrchestrator(new Mock<ItemOrchestrator>().Object, offerMock.Object);
             var expected = 2.85m;
-            orchestrator._listCheckout = new List<Checkout>() { CheckoutItems(id) };
+            orchestrator._listCheckout = new List<Checkout>() { checkoutItems };
             //act
-            var actual=orchestrator.GetTotalPrice(id);
+            var actual=orchestrator.GetTotalPrice(checkoutId);
             //assert
 
             actual.Should().Be(expected);
         }
-        private Checkout CheckoutItems(Guid id)
+        [TestInitialize]
+        public void Initialize()
+        {
+            checkoutId = Guid.NewGuid();
+            checkoutItems = CheckoutItems();
+        }
+        [TestCleanup]
+        public void CleanUp()
+        {
+            checkoutItems = null;
+        }
+        private Checkout CheckoutItems()
         {
             return new Checkout
             {
-                 Id=id,
+                 Id= checkoutId,
                  Items=new List<Item> {
                   new Item { SKU="A99", Price = 0.50m },
                   new Item { SKU="B15", Price = 0.30m },
