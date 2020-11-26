@@ -55,7 +55,7 @@ namespace SortedKata.Tests
         }
         [TestMethod]
         [TestCategory("Checkout > CalculateDiscount")]
-        public void CalculateDiscount_IfNoOfferFound_ShouldReturnDiscountValueZero()
+        public void CalculateDiscount_IfNoOfferFound_ShouldNotCalculateDiscount()
         {
             // arrange
             var orchestrator = new CheckoutOrchestrator(new Mock<ItemOrchestrator>().Object, new Mock<IOfferOrchestrator>().Object);
@@ -66,10 +66,26 @@ namespace SortedKata.Tests
             //assert
             actual.Should().Be(expected);
         }
-
+        [TestMethod]
+        [TestCategory("Checkout > CalculateDiscount")]
+        public void CalculateDiscount_IfOfferFound_ShouldCalculateDiscount()
+        {
+            // arrange
+            var offerMock = new Mock<IOfferOrchestrator>();
+            offerMock.Setup(mock => mock.GetOffer("B15"))
+                .Returns(new ItemOffer { OfferPrice = 0.45m, Quantity = 2, SKU = "B15" });
+            var orchestrator = new CheckoutOrchestrator(new Mock<ItemOrchestrator>().Object, offerMock.Object);
+            var sku = "B15";
+            var expected = 0.15m;
+            orchestrator._listCheckout = new List<Checkout>() { checkoutItems };
+            //act
+            var actual = orchestrator.CalculateDiscount(sku);
+            //assert
+            actual.Should().Be(expected);
+        }
         [TestMethod]
         [TestCategory("Checkout > GetTotalPrice")]
-        public void GetTotalPrice_ByCheckoutId_ShouldMatchExpectedValue()
+        public void GetTotalPrice_IfOfferExists_ShouldApplyDiscount()
         {
             // arrange
             var offerMock = new Mock<IOfferOrchestrator>();
@@ -82,6 +98,20 @@ namespace SortedKata.Tests
             orchestrator._listCheckout = new List<Checkout>() { checkoutItems };
             //act
             var actual=orchestrator.GetTotalPrice(checkoutId);
+            //assert
+
+            actual.Should().Be(expected);
+        }
+        [TestMethod]
+        [TestCategory("Checkout > GetTotalPrice")]
+        public void GetTotalPrice_IfNoOfferExists_ShouldNotApplyDiscount()
+        {
+            // arrange
+            var orchestrator = new CheckoutOrchestrator(new Mock<ItemOrchestrator>().Object, new Mock<IOfferOrchestrator>().Object);
+            var expected = checkoutItems.Items.Sum(p=>p.Price);
+            orchestrator._listCheckout = new List<Checkout>() { checkoutItems };
+            //act
+            var actual = orchestrator.GetTotalPrice(checkoutId);
             //assert
 
             actual.Should().Be(expected);

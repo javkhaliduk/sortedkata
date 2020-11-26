@@ -8,9 +8,10 @@ namespace SortedKata.BLL.Implementation
 {
     public class OfferOrchestrator : IOfferOrchestrator
     {
-        public List<ItemOffer> itemOffers = new List<ItemOffer>();
+        public List<ItemOffer> itemOffers;
         public OfferOrchestrator()
         {
+            itemOffers = new List<ItemOffer>();
         }
         public bool AddOffer(ItemOffer itemOffer)
         {
