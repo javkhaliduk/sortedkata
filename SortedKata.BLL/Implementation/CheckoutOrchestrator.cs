@@ -22,21 +22,32 @@ namespace SortedKata.BLL.Implementation
             if (string.IsNullOrEmpty(sku))
                 throw new ArgumentNullException(sku);
             var offer= _offerOrchestrator.GetOffer(sku);
-            var items=_listCheckout.First().Items;
-            var itemQuantity = items.Count(p => p.SKU == sku);
-            var totalDiscount = 0.0m;
-            if (offer != null)
+            if (offer == null)
             {
-                var modulas = itemQuantity % offer.Quantity;
-                itemQuantity = modulas != 0 ? itemQuantity - modulas : itemQuantity;
-                totalDiscount=(itemQuantity / offer.Quantity) * offer.OfferPrice;
+                return 0.0m;
             }
-            return totalDiscount;
+            var items = _listCheckout.First().Items;
+            var itemQuantity = items.Count(p => p.SKU == sku);
+            var totalPrice = items.Where(p => p.SKU == sku).Sum(p => p.Price);
+            var unitPrice = items.FirstOrDefault(p => p.SKU == sku).Price;
+            var totalDiscount = 0.0m;
+            var modulas = itemQuantity % offer.Quantity;
+            itemQuantity = modulas != 0 ? itemQuantity - modulas : itemQuantity;
+            totalDiscount = (itemQuantity / offer.Quantity) * offer.OfferPrice;
+            return (totalPrice - totalDiscount) - (modulas * unitPrice);
         }
 
-        public decimal GetTotalPrice()
+        public decimal GetTotalPrice(Guid id)
         {
-            return _listCheckout.First().Items.Sum(p => p.Price);
+            var totalPrice= _listCheckout.First(p=>p.Id==id).Items.Sum(p => p.Price);
+            var items = _listCheckout.First(p => p.Id == id).Items.Select(p=>p.SKU).Distinct();
+            var totalDiscount = 0.0m;
+
+            foreach (var item in items)
+            {
+                totalDiscount += CalculateDiscount(item);
+            }
+            return totalPrice- totalDiscount;
         }
 
         public bool ScanItem(string sku)
@@ -53,5 +64,9 @@ namespace SortedKata.BLL.Implementation
             }
         }
 
+        public Checkout GetAllCheckoutItems(Guid id)
+        {
+            return _listCheckout.FirstOrDefault(p => p.Id == id);
+        }
     }
 }

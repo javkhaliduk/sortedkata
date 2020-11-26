@@ -6,6 +6,7 @@ using SortedKata.BLL.Interfaces;
 using SortedKata.BLL.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SortedKata.Tests
 {
@@ -16,9 +17,9 @@ namespace SortedKata.Tests
         public void AddItemsToCheckout_IfSkuNullOrEmpty_ShouldThrowArgumentNullException()
         {
             // arrange
-            var orchestrator = new CheckoutOrchestrator(new Mock<ItemOrchestrator>().Object,new Mock<IOfferOrchestrator>().Object);
+            var orchestrator = new CheckoutOrchestrator(new Mock<ItemOrchestrator>().Object, new Mock<IOfferOrchestrator>().Object);
             //act
-            Func<bool> action = ()=> { return orchestrator.ScanItem(null); };
+            Func<bool> action = () => { return orchestrator.ScanItem(null); };
             //assert
             action.Should().Throw<ArgumentNullException>();
         }
@@ -30,7 +31,7 @@ namespace SortedKata.Tests
             mockItem.Setup(mock => mock.GetItem(It.IsAny<string>())).Returns(new Item { SKU = "A99", Price = 0.50m });
             var orchestrator = new CheckoutOrchestrator(mockItem.Object, new Mock<IOfferOrchestrator>().Object);
             //act
-            var itemAdded=orchestrator.ScanItem("A99");
+            var itemAdded = orchestrator.ScanItem("A99");
             //assert
             itemAdded.Should().BeTrue();
         }
@@ -40,7 +41,7 @@ namespace SortedKata.Tests
             // arrange
             var orchestrator = new CheckoutOrchestrator(new Mock<ItemOrchestrator>().Object, new Mock<IOfferOrchestrator>().Object);
             //act
-            Func<decimal> action = () =>{
+            Func<decimal> action = () => {
                 return orchestrator.CalculateDiscount(null);
             };
 
@@ -48,5 +49,40 @@ namespace SortedKata.Tests
             action.Should().Throw<ArgumentNullException>();
         }
 
+        [TestMethod]
+        public void GetTotalPrice_ByCheckoutId_ShouldMatchExpectedValue()
+        {
+            // arrange
+            var id = Guid.NewGuid();
+            var offerMock = new Mock<IOfferOrchestrator>();
+            offerMock.Setup(mock => mock.GetOffer("B15"))
+                .Returns(new ItemOffer { OfferPrice = 0.45m, Quantity = 2, SKU = "B15" });
+            offerMock.Setup(mock => mock.GetOffer("A99"))
+               .Returns(new ItemOffer { OfferPrice = 1.30m, Quantity = 3, SKU = "A99" });
+            var orchestrator = new CheckoutOrchestrator(new Mock<ItemOrchestrator>().Object, offerMock.Object);
+            var expected = 2.85m;
+            orchestrator._listCheckout = new List<Checkout>() { CheckoutItems(id) };
+            //act
+            var actual=orchestrator.GetTotalPrice(id);
+            //assert
+
+            actual.Should().Be(expected);
+        }
+        private Checkout CheckoutItems(Guid id)
+        {
+            return new Checkout
+            {
+                 Id=id,
+                 Items=new List<Item> {
+                  new Item { SKU="A99", Price = 0.50m },
+                  new Item { SKU="B15", Price = 0.30m },
+                  new Item { SKU="C40", Price = 0.60m },
+                  new Item { SKU="A99", Price = 0.50m },
+                  new Item { SKU="B15", Price = 0.30m },
+                  new Item { SKU="A99", Price = 0.50m },
+                  new Item { SKU="A99", Price = 0.50m }
+                 }
+            };
+        }
     }
 }
