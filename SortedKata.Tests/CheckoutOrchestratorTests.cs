@@ -48,6 +48,18 @@ namespace SortedKata.Tests
             //assert
             action.Should().Throw<ArgumentNullException>();
         }
+        [TestMethod]
+        public void CalculateDiscount_IfNoOfferFound_ShouldReturnDiscountValueZero()
+        {
+            // arrange
+            var orchestrator = new CheckoutOrchestrator(new Mock<ItemOrchestrator>().Object, new Mock<IOfferOrchestrator>().Object);
+            var sku = "B15";
+            var expected = 0.0m;
+            //act
+            var actual = orchestrator.CalculateDiscount(sku);
+            //assert
+            actual.Should().Be(expected);
+        }
 
         [TestMethod]
         public void GetTotalPrice_ByCheckoutId_ShouldMatchExpectedValue()

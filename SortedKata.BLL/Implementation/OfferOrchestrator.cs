@@ -27,12 +27,5 @@ namespace SortedKata.BLL.Implementation
                 throw new ArgumentNullException();
             return itemOffers.FirstOrDefault(p => p.SKU == sku);
         }
-        private void PopulateItems()
-        {
-            itemOffers = new List<ItemOffer> {
-            new ItemOffer{SKU="A99", Quantity=3, OfferPrice=1.30m },
-            new ItemOffer{ SKU="B15", Quantity=2, OfferPrice=0.45m }
-            };
-        }
     }
 }

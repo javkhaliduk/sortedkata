@@ -4,6 +4,7 @@ using Moq;
 using SortedKata.BLL.Implementation;
 using SortedKata.BLL.Interfaces;
 using SortedKata.BLL.Models;
+using System;
 using System.Collections.Generic;
 
 namespace SortedKata.Tests
@@ -20,6 +21,16 @@ namespace SortedKata.Tests
             var offerAdded=orchestrator.AddOffer(new ItemOffer { SKU = "A99", Quantity = 3, OfferPrice = 1.30m });
             //assert
             offerAdded.Should().BeTrue();
+        }
+        [TestMethod]
+        public void AddOffer_IfArgumentIsNull_ShouldThrowArgumentNullException()
+        {
+            //arrange
+            var orchestrator = new OfferOrchestrator();
+            //act
+            Func<bool> action = () => { return orchestrator.AddOffer(null); };
+            //assert
+            action.Should().Throw<ArgumentNullException>();
         }
         [TestMethod]
         public void GetOffer_IfFound_ShouldNotBeNull()
