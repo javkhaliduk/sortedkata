@@ -97,7 +97,7 @@ namespace SortedKata.Tests
             var expected = 2.85m;
             orchestrator._listCheckout = new List<Checkout>() { checkoutItems };
             //act
-            var actual=orchestrator.GetTotalPrice(checkoutId);
+            var actual=orchestrator.GetTotalPriceWithDiscount(checkoutId);
             //assert
 
             actual.Should().Be(expected);
@@ -109,6 +109,20 @@ namespace SortedKata.Tests
             // arrange
             var orchestrator = new CheckoutOrchestrator(new Mock<ItemOrchestrator>().Object, new Mock<IOfferOrchestrator>().Object);
             var expected = checkoutItems.Items.Sum(p=>p.Price);
+            orchestrator._listCheckout = new List<Checkout>() { checkoutItems };
+            //act
+            var actual = orchestrator.GetTotalPriceWithDiscount(checkoutId);
+            //assert
+
+            actual.Should().Be(expected);
+        }
+        [TestMethod]
+        [TestCategory("Checkout > GetTotalPrice")]
+        public void GetTotalPrice_ShouldReturnTotalPriceWithoutDiscount()
+        {
+            // arrange
+            var orchestrator = new CheckoutOrchestrator(new Mock<ItemOrchestrator>().Object, new Mock<IOfferOrchestrator>().Object);
+            var expected = checkoutItems.Items.Sum(p => p.Price);
             orchestrator._listCheckout = new List<Checkout>() { checkoutItems };
             //act
             var actual = orchestrator.GetTotalPrice(checkoutId);

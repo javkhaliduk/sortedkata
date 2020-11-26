@@ -8,6 +8,7 @@ namespace SortedKata.BLL.Interfaces
     {
         bool ScanItem(string sku);
         decimal GetTotalPrice(Guid id);
+        decimal GetTotalPriceWithDiscount(Guid id);
         decimal CalculateDiscount(string sku);
         Checkout GetAllCheckoutItems(Guid id);
     }

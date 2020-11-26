@@ -37,9 +37,9 @@ namespace SortedKata.BLL.Implementation
             return (totalPrice - totalDiscount) - (modulas * unitPrice);
         }
 
-        public decimal GetTotalPrice(Guid id)
+        public decimal GetTotalPriceWithDiscount(Guid id)
         {
-            var totalPrice= _listCheckout.First(p=>p.Id==id).Items.Sum(p => p.Price);
+            var totalPrice= GetTotalPrice(id);
             var items = _listCheckout.First(p => p.Id == id).Items.Select(p=>p.SKU).Distinct();
             var totalDiscount = 0.0m;
 
@@ -67,6 +67,11 @@ namespace SortedKata.BLL.Implementation
         public Checkout GetAllCheckoutItems(Guid id)
         {
             return _listCheckout.FirstOrDefault(p => p.Id == id);
+        }
+
+        public decimal GetTotalPrice(Guid id)
+        {
+            return  _listCheckout.First(p => p.Id == id).Items.Sum(p => p.Price);
         }
     }
 }
