@@ -1,11 +1,8 @@
 ﻿using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
 using SortedKata.BLL.Implementation;
-using SortedKata.BLL.Interfaces;
 using SortedKata.BLL.Models;
 using System;
-using System.Collections.Generic;
 
 namespace SortedKata.Tests
 {

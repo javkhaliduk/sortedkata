@@ -8,7 +8,7 @@ namespace SortedKata.BLL.Implementation
 {
     public class ItemOrchestrator : IItemOrchestrator
     {
-        List<Item> _listItems;
+        public List<Item> _listItems;
         public ItemOrchestrator()
         {
             _listItems = new List<Item>();

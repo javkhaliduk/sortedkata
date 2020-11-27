@@ -29,5 +29,19 @@ namespace SortedKata.Tests
             //assert
             action.Should().Throw<ArgumentNullException>();
         }
+        [TestMethod]
+        public void GetItem_IfSKUExists__ShouldReturnItem()
+        {
+            //arrange
+            var orchestrator = new ItemOrchestrator();
+            var expected = new Item { SKU = "A99", Price = 0.50m };
+            orchestrator._listItems.Add(expected);
+            //act
+            var item= orchestrator.GetItem("A99"); ;
+            //assert
+            item.Should().NotBeNull();
+            item.Should().Equals(expected);
+            
+        }
     }
 }

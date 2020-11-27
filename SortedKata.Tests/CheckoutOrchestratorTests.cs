@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace SortedKata.Tests
 {
-    
+
     [TestClass]
     public class CheckoutOrchestratorTests
     {
@@ -46,7 +46,8 @@ namespace SortedKata.Tests
             // arrange
             var orchestrator = new CheckoutOrchestrator(new Mock<ItemOrchestrator>().Object, new Mock<IOfferOrchestrator>().Object);
             //act
-            Func<decimal> action = () => {
+            Func<decimal> action = () =>
+            {
                 return orchestrator.CalculateDiscount(null);
             };
 
@@ -76,7 +77,7 @@ namespace SortedKata.Tests
                 .Returns(new ItemOffer { OfferPrice = 0.45m, Quantity = 2, SKU = "B15" });
             var orchestrator = new CheckoutOrchestrator(new Mock<ItemOrchestrator>().Object, offerMock.Object);
             var sku = "B15";
-            var expected = 0.15m;
+            var expected = 0.45m;
             orchestrator._listCheckout = new List<Checkout>() { checkoutItems };
             //act
             var actual = orchestrator.CalculateDiscount(sku);
@@ -94,10 +95,10 @@ namespace SortedKata.Tests
             offerMock.Setup(mock => mock.GetOffer("A99"))
                .Returns(new ItemOffer { OfferPrice = 1.30m, Quantity = 3, SKU = "A99" });
             var orchestrator = new CheckoutOrchestrator(new Mock<ItemOrchestrator>().Object, offerMock.Object);
-            var expected = 2.85m;
+            var expected = 4.05m;
             orchestrator._listCheckout = new List<Checkout>() { checkoutItems };
             //act
-            var actual=orchestrator.GetTotalPriceWithDiscount(checkoutId);
+            var actual = orchestrator.GetTotalPriceWithDiscount(checkoutId);
             //assert
 
             actual.Should().Be(expected);
@@ -108,7 +109,7 @@ namespace SortedKata.Tests
         {
             // arrange
             var orchestrator = new CheckoutOrchestrator(new Mock<ItemOrchestrator>().Object, new Mock<IOfferOrchestrator>().Object);
-            var expected = checkoutItems.Items.Sum(p=>p.Price);
+            var expected = checkoutItems.Items.Sum(p => p.Price);
             orchestrator._listCheckout = new List<Checkout>() { checkoutItems };
             //act
             var actual = orchestrator.GetTotalPriceWithDiscount(checkoutId);
@@ -145,15 +146,20 @@ namespace SortedKata.Tests
         {
             return new Checkout
             {
-                 Id= checkoutId,
-                 Items=new List<Item> {
+                Id = checkoutId,
+                Items = new List<Item> {
                   new Item { SKU="A99", Price = 0.50m },
                   new Item { SKU="B15", Price = 0.30m },
                   new Item { SKU="C40", Price = 0.60m },
                   new Item { SKU="A99", Price = 0.50m },
                   new Item { SKU="B15", Price = 0.30m },
                   new Item { SKU="A99", Price = 0.50m },
-                  new Item { SKU="A99", Price = 0.50m }
+                  new Item { SKU="B15", Price = 0.30m },
+                  new Item { SKU="B15", Price = 0.30m },
+                  new Item { SKU="A99", Price = 0.50m },
+                  new Item { SKU="B15", Price = 0.30m },
+                  new Item { SKU="B15", Price = 0.30m },
+                  new Item { SKU="B15", Price = 0.30m },
                  }
             };
         }
