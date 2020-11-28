@@ -10,12 +10,15 @@ namespace SortedKata.BLL.Implementation
     {
         IItemOrchestrator _itemorchestrator;
         IOfferOrchestrator _offerOrchestrator;
+        IDiscountOrchestrator _discountOrchestrator;
         public List<Checkout> _listCheckout;
-        public CheckoutOrchestrator(IItemOrchestrator itemOrchestrator,IOfferOrchestrator offerOrchestrator)
+        public CheckoutOrchestrator(IItemOrchestrator itemOrchestrator,
+            IOfferOrchestrator offerOrchestrator,IDiscountOrchestrator discountOrchestrator)
         {
             _itemorchestrator = itemOrchestrator;
             _offerOrchestrator = offerOrchestrator;
             _listCheckout = new List<Checkout>();
+            _discountOrchestrator = discountOrchestrator;
         }
         public decimal CalculateDiscount(string sku)
         {
@@ -26,15 +29,8 @@ namespace SortedKata.BLL.Implementation
             {
                 return 0.0m;
             }
-            var items = _listCheckout.First().Items;
-            var itemQuantity = items.Count(p => p.SKU == sku);
-            var totalPrice = items.Where(p => p.SKU == sku).Sum(p => p.Price);
-            var unitPrice = items.FirstOrDefault(p => p.SKU == sku).Price;
-            var totalDiscount = 0.0m;
-            var modulas = itemQuantity % offer.Quantity;
-            itemQuantity = modulas != 0 ? itemQuantity - modulas : itemQuantity;
-            totalDiscount = (itemQuantity / offer.Quantity) * offer.OfferPrice;
-            return (totalPrice - totalDiscount) - (modulas * unitPrice);
+            var items = _listCheckout.First().Items.Where(p=>p.SKU==sku).ToList();
+            return _discountOrchestrator.CalculateDiscount(items, offer);
         }
 
         public decimal GetTotalPriceWithDiscount(Guid id)
