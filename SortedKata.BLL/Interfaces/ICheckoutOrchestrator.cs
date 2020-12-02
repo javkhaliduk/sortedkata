@@ -6,7 +6,7 @@ namespace SortedKata.BLL.Interfaces
 {
     public interface ICheckoutOrchestrator
     {
-        bool ScanItem(string sku);
+        bool ScanItem(string sku,Guid id);
         decimal GetTotalPrice(Guid id);
         decimal GetTotalPriceWithDiscount(Guid id);
         decimal CalculateDiscount(string sku);

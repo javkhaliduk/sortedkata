@@ -46,16 +46,24 @@ namespace SortedKata.BLL.Implementation
             return totalPrice- totalDiscount;
         }
 
-        public bool ScanItem(string sku)
+        public bool ScanItem(string sku,Guid id)
         {
             if (string.IsNullOrEmpty(sku))
                 throw new ArgumentNullException(sku);
             else
             {
                 var item = _itemorchestrator.GetItem(sku);
-                var items = _listCheckout.FirstOrDefault()?.Items ?? new List<Item>();
-                items.Add(item);
-                _listCheckout.Add(new Checkout { Id = Guid.NewGuid(), Items = items });
+                var checkoutCart=_listCheckout.FirstOrDefault(p => p.Id == id);
+                var items = checkoutCart?.Items ?? new List<Item>();
+                if (checkoutCart == null)
+                {
+                    items.Add(item);
+                    _listCheckout.Add(new Checkout { Id = Guid.NewGuid(), Items = items });
+                }
+                else {
+                    checkoutCart.Items.Add(item);
+                }
+                
                 return true;
             }
         }

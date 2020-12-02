@@ -23,20 +23,35 @@ namespace SortedKata.Tests
             // arrange
             var orchestrator = new CheckoutOrchestrator(new Mock<ItemOrchestrator>().Object, new Mock<IOfferOrchestrator>().Object,new Mock<DiscountOrchestrator>().Object);
             //act
-            Func<bool> action = () => { return orchestrator.ScanItem(null); };
+            Func<bool> action = () => { return orchestrator.ScanItem(null, checkoutId); };
             //assert
             action.Should().Throw<ArgumentNullException>();
         }
         [TestMethod]
         [TestCategory("Checkout > ScanItem")]
-        public void AddItemsToCheckout_AddItem_ShouldReturnTrue()
+        public void AddItemsToCheckout_IfCheckoutExists_ShouldAddItemsToExistingCheckout()
+        {
+            // arrange
+            Mock<IItemOrchestrator> mockItem = new Mock<IItemOrchestrator>();
+            mockItem.Setup(mock => mock.GetItem(It.IsAny<string>())).Returns(new Item { SKU = "A99", Price = 0.50m });
+            var orchestrator = new CheckoutOrchestrator(mockItem.Object, new Mock<IOfferOrchestrator>().Object, new Mock<DiscountOrchestrator>().Object);
+            orchestrator._listCheckout = new List<Checkout> { new Checkout { Id=checkoutId, Items=new List<Item> { new
+                 Item{ Price=0.50m, SKU= "A99"} } } };
+            //act
+            var itemAdded = orchestrator.ScanItem("A99", checkoutId);
+            //assert
+            itemAdded.Should().BeTrue();
+        }
+        [TestMethod]
+        [TestCategory("Checkout > ScanItem")]
+        public void AddItemsToCheckout_IfCheckoutNotFoundAddItem_ShouldCreateNewCheckout()
         {
             // arrange
             Mock<IItemOrchestrator> mockItem = new Mock<IItemOrchestrator>();
             mockItem.Setup(mock => mock.GetItem(It.IsAny<string>())).Returns(new Item { SKU = "A99", Price = 0.50m });
             var orchestrator = new CheckoutOrchestrator(mockItem.Object, new Mock<IOfferOrchestrator>().Object, new Mock<DiscountOrchestrator>().Object);
             //act
-            var itemAdded = orchestrator.ScanItem("A99");
+            var itemAdded = orchestrator.ScanItem("A99", Guid.NewGuid());
             //assert
             itemAdded.Should().BeTrue();
         }
